@@ -3,9 +3,10 @@ const Meme = require('./model.js');
 
 //Retrieve all memes
 exports.allMemes = (req, res) => {
+    console.log('Requested')
     axios.get('http://alpha-meme-maker.herokuapp.com/1')
     .then(memes => {
-        res.send(memes.data);
+        res.send(memes.data.data);
     }).catch(error => {
         res.status(500).send({message: error.message || "Some error occurred while retrirving your memes"});
     });
@@ -25,9 +26,10 @@ exports.findAll = (req, res) => {
 
 //Create and Save a new favourite meme
 exports.create = (req, res) => {
-   if(!req.body.name){
+    console.log(req.body, '....juiuuiiii')
+   if(!req.body.caption){
        return res.status(400).send({
-           message: "Meme name cannot be empty"
+           message: "Meme caption cannot be empty"
        });
    }
 
@@ -75,9 +77,9 @@ exports.findOne = (req, res) => {
 
 // Update single meme by an ID
 exports.update = (req, res) => {
-    if(!req.body.name){
+    if(!req.body.caption){
         return res.status(400).send({
-            message: "Meme name can not be empty"
+            message: "Caption cannot be empty"
         });
     }
 
@@ -116,7 +118,7 @@ exports.delete = (req, res) => {
                 message:  `Meme with ID ${id} was not found`
             });
         }
-        res.send({message: "Meme deleted successfully!"});
+        res.send({message: "Meme deleted successfully!", _id:id});
     }).catch(err => {
         if(err.kind === 'ObjectId' || err.name === 'NotFound') {
             return res.status(404).send({
@@ -128,3 +130,17 @@ exports.delete = (req, res) => {
         });
     });
 };
+
+// Filter meme
+exports.search = (req, res) => {
+    const query = req.query.caption;
+    const regex = new RegExp(query, 'i');
+    Meme.find({caption: {$regex: regex}})
+    .then(favMemes => {
+        res.send(favMemes);
+    }).catch(error => {
+        res.status(500).send({message: error.message || "Some error occurred while retrirving your favourite memes"});
+    });
+
+    
+}

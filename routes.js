@@ -19,4 +19,7 @@ module.exports = (app) => {
 
     //Delete a meme with ID
     app.delete('/fav-memes/:memeId', memes.delete);
+
+    //Search a meme by it's caption
+    app.get('/fav-memes-search', memes.search)
 }
